@@ -149,6 +149,49 @@ a.tel{font-weight:700}
 }
 @media (prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
 [hidden]{display:none!important}
+
+/* Suggestions and admin */
+.sgbar{display:flex;flex-wrap:wrap;gap:10px}
+.sgbtn{font:inherit;font-weight:700;font-size:.9rem;color:var(--on-accent);background:var(--brand);border:1.5px solid var(--brand);border-radius:999px;padding:8px 18px;min-height:44px;cursor:pointer}
+.sgbtn.alt{background:transparent;color:var(--brand)}
+.sgbtn.ghost{background:transparent;color:var(--muted);border-color:var(--rule-2)}
+.sgbtn.danger{background:var(--downtown);border-color:var(--downtown)}
+.sgbtn:hover{filter:brightness(1.07)}
+.sgbtn:disabled{opacity:.55;cursor:default}
+.sgbtn:focus-visible,.linkbtn:focus-visible{outline:3px solid var(--link);outline-offset:2px}
+.foot{text-align:center;font-size:.85rem;color:var(--muted)}
+.linkbtn{font:inherit;color:var(--muted);background:none;border:0;text-decoration:underline;cursor:pointer;padding:8px}
+dialog.bbd{border:1px solid var(--rule-2);border-radius:16px;background:var(--surface);color:var(--ink);padding:0;width:min(600px,calc(100vw - 24px));max-height:calc(100dvh - 24px);overflow:auto;box-shadow:var(--shadow-up)}
+dialog.bbd::backdrop{background:rgba(10,14,22,.6)}
+.bbd form,.bbd .bbd-in{display:flex;flex-direction:column;gap:14px;padding:22px}
+.bbd h2{font-size:1.4rem;color:var(--brand)}
+.bbd .sub{color:var(--muted);font-size:.92rem}
+.bbd label{display:flex;flex-direction:column;gap:5px;font-weight:700;font-size:.82rem;color:var(--muted)}
+.bbd input[type=text],.bbd input[type=email],.bbd input[type=url],.bbd input[type=tel],.bbd select,.bbd textarea{font:inherit;font-weight:400;font-size:1rem;color:var(--ink);background:var(--bg);border:1px solid var(--rule-2);border-radius:10px;padding:10px 12px;min-height:44px;width:100%}
+.bbd textarea{min-height:90px;resize:vertical}
+.bbd input:focus-visible,.bbd select:focus-visible,.bbd textarea:focus-visible{outline:3px solid var(--link);outline-offset:1px}
+.bbd .row{display:grid;grid-template-columns:1fr;gap:14px}
+@media (min-width:560px){.bbd .row{grid-template-columns:1fr 1fr}}
+.bbd .acts{display:flex;flex-wrap:wrap;gap:10px;justify-content:flex-end}
+.bbd .msg{min-height:1.3em;font-size:.9rem;color:var(--muted)}
+.bbd .msg.err{color:var(--downtown)}
+.bbd .hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+.bbd fieldset{border:1px solid var(--rule-2);border-radius:10px;padding:10px 12px;margin:0}
+.bbd legend{font-weight:700;font-size:.82rem;color:var(--muted);padding:0 4px}
+.bbd .cks{display:flex;flex-wrap:wrap;gap:6px 16px}
+.bbd .cks label{flex-direction:row;align-items:center;gap:6px;font-weight:600;font-size:.92rem;color:var(--ink)}
+.bbd .cks input,.bbd .chk input{width:18px;height:18px}
+.bbd .chk{flex-direction:row;align-items:center;gap:8px;font-weight:600;color:var(--ink)}
+.pick{position:relative;max-width:300px;line-height:0;cursor:crosshair;border:2px solid var(--rule-2);border-radius:12px;overflow:hidden;touch-action:manipulation}
+.pick img{width:100%;height:auto;display:block}
+.pick .dot{position:absolute;width:22px;height:22px;border-radius:50%;background:var(--brand);border:3px solid #fff;box-shadow:0 0 0 2px #202124;transform:translate(-50%,-50%);pointer-events:none}
+.sglist{display:flex;flex-direction:column;gap:12px}
+.sgitem{border:1px solid var(--rule);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:6px;background:var(--bg)}
+.sgitem h3{font-size:1.1rem}
+.sgitem p{font-size:.92rem;overflow-wrap:anywhere}
+.sgitem .meta{color:var(--muted);font-size:.82rem}
+.sgitem .acts{margin-top:4px}
+#bb-toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);max-width:min(480px,calc(100vw - 32px));background:var(--ink);color:var(--bg);padding:12px 18px;border-radius:12px;font-weight:600;font-size:.95rem;z-index:50;box-shadow:var(--shadow-up)}
 </style>
 
 <div class="wrap">
@@ -162,6 +205,11 @@ a.tel{font-weight:700}
       <div class="fact"><span>Group size</span><b>6–10</b><small>Many places add a 20% tip automatically for 6 or more</small></div>
     </div>
   </header>
+
+  <div class="sgbar" id="sg-bar" hidden>
+    <button type="button" class="sgbtn" id="sg-open">+ Suggest a place</button>
+    <button type="button" class="sgbtn alt" id="sg-review" hidden>Review suggestions <span id="sg-count"></span></button>
+  </div>
 
   <div class="filterbox">
     <div class="filter" role="group" aria-label="Filter by cuisine"><p class="filter-l">Cuisine</p><div class="chips"><button type="button" class="chip on" data-type="all" aria-pressed="true">All <span>19</span></button><button type="button" class="chip" data-type="Thai" aria-pressed="false">Thai <span>6</span></button><button type="button" class="chip" data-type="Japanese" aria-pressed="false">Japanese <span>4</span></button><button type="button" class="chip" data-type="Chinese" aria-pressed="false">Chinese <span>2</span></button><button type="button" class="chip" data-type="Vietnamese" aria-pressed="false">Vietnamese <span>1</span></button><button type="button" class="chip" data-type="Latin" aria-pressed="false">Latin <span>3</span></button><button type="button" class="chip" data-type="Mediterranean" aria-pressed="false">Mediterranean <span>3</span></button><button type="button" class="chip" data-type="American" aria-pressed="false">American <span>1</span></button></div><p class="filter-s" id="fstatus" aria-live="polite"></p></div>
@@ -559,12 +607,84 @@ a.tel{font-weight:700}
     </div>
   </section>
 
+  <footer class="foot" id="sg-foot" hidden><button type="button" class="linkbtn" id="ad-link">Admin</button></footer>
 </div>
+
+<dialog class="bbd" id="sg-dialog" aria-labelledby="sg-t">
+  <form id="sg-form" novalidate>
+    <h2 id="sg-t">Suggest a place</h2>
+    <p class="sub">Know a good spot for Sunday lunch? Send it to the admin. If it is declined, you will get an email explaining why.</p>
+    <label>Restaurant name<input type="text" name="name" maxlength="100" required autocomplete="off"></label>
+    <label>Website or address (optional)<input type="text" name="website" maxlength="200" autocomplete="off"></label>
+    <div class="row">
+      <label>Cuisine (optional)<input type="text" name="cuisine" maxlength="60" autocomplete="off"></label>
+      <label>Your email<input type="email" name="email" maxlength="254" required autocomplete="email"></label>
+    </div>
+    <label>Why is it a good fit? (optional)<textarea name="notes" maxlength="500"></textarea></label>
+    <div class="hp" aria-hidden="true"><label>Leave empty<input type="text" name="company" tabindex="-1" autocomplete="off"></label></div>
+    <p class="msg" role="status" aria-live="polite"></p>
+    <div class="acts"><button type="button" class="sgbtn ghost" data-close>Cancel</button><button type="submit" class="sgbtn">Send suggestion</button></div>
+  </form>
+</dialog>
+
+<dialog class="bbd" id="ad-dialog" aria-labelledby="ad-t">
+  <div class="bbd-in">
+    <h2 id="ad-t">Pending suggestions</h2>
+    <p class="sub" id="ad-who"></p>
+    <div class="sglist" id="ad-list"></div>
+    <div class="acts"><button type="button" class="sgbtn ghost" id="ad-out">Sign out</button><button type="button" class="sgbtn" data-close>Close</button></div>
+  </div>
+</dialog>
+
+<dialog class="bbd" id="dc-dialog" aria-labelledby="dc-t">
+  <form id="dc-form" novalidate>
+    <h2 id="dc-t">Decline suggestion</h2>
+    <p class="sub" id="dc-sub"></p>
+    <label>Reason (this is emailed to the suggestor)<textarea name="reason" maxlength="1000" required></textarea></label>
+    <p class="msg" role="status" aria-live="polite"></p>
+    <div class="acts"><button type="button" class="sgbtn ghost" data-close>Cancel</button><button type="button" class="sgbtn ghost" id="dc-skip" hidden>Decline without email</button><button type="submit" class="sgbtn danger">Decline and send</button></div>
+  </form>
+</dialog>
+
+<dialog class="bbd" id="ap-dialog" aria-labelledby="ap-t">
+  <form id="ap-form" novalidate>
+    <h2 id="ap-t">Approve and add to the list</h2>
+    <p class="sub">Fill in the details that will appear on the website.</p>
+    <div class="row">
+      <label>Region<select name="region" required><option value="">Choose…</option><option value="uptown">Uptown</option><option value="downtown">Downtown</option><option value="tryout">To try out</option></select></label>
+      <label>Name<input type="text" name="name" maxlength="100" required></label>
+    </div>
+    <fieldset><legend>Cuisine</legend><div class="cks" id="ap-cuisines"></div></fieldset>
+    <div class="row">
+      <label>Other cuisine (optional, one word)<input type="text" name="otherCuisine" maxlength="30"></label>
+      <label>Cuisine label on card<input type="text" name="food" maxlength="60" placeholder="e.g. Thai"></label>
+    </div>
+    <label>Description<textarea name="about" maxlength="500"></textarea></label>
+    <div class="row">
+      <label>Website<input type="text" name="website" maxlength="200"></label>
+      <label>Phone<input type="tel" name="phone" maxlength="30"></label>
+    </div>
+    <label>Address and cross streets<input type="text" name="address" maxlength="200" placeholder="141 W 72nd St (Columbus–Amsterdam)"></label>
+    <div class="row">
+      <label>Walk from church<input type="text" name="walk" maxlength="60" placeholder="About 11 min"></label>
+      <label>Hours<input type="text" name="hours" maxlength="120" placeholder="Sun 12–8pm"></label>
+    </div>
+    <div>
+      <p class="sub" style="margin-bottom:6px"><b>Map pin:</b> click the map where the restaurant is.</p>
+      <div class="pick" id="ap-pick"><img alt="Map for placing the pin"><span class="dot" hidden></span></div>
+    </div>
+    <label class="chk" id="ap-mail-l"><input type="checkbox" name="notify" checked> Email the suggestor that it was approved</label>
+    <p class="msg" role="status" aria-live="polite"></p>
+    <div class="acts"><button type="button" class="sgbtn ghost" data-close>Cancel</button><button type="submit" class="sgbtn">Approve and add</button></div>
+  </form>
+</dialog>
+<div id="bb-toast" role="status" aria-live="polite" hidden></div>
+
 <script>
 (function(){
-  var chips=document.querySelectorAll('.chip'), cards=document.querySelectorAll('.card'),
-      secs=document.querySelectorAll('.sec:not(.agenda)'), status=document.getElementById('fstatus'), navs=null;
+  var status=document.getElementById('fstatus'), navs=null;
   var areas={}, curT='all', abtns=document.querySelectorAll('nav.jump button.area');
+  function chipsNow(){ return document.querySelectorAll('.chip'); }
   function secOf(el){ var s=el.getAttribute('data-sec'); if(s) return s; return el.classList.contains('uptown')?'uptown':el.classList.contains('downtown')?'downtown':'tryout'; }
   function anyArea(){ return Object.keys(areas).length>0; }
   function areaOk(el){ return !anyArea() || areas[secOf(el)]; }
@@ -572,11 +692,14 @@ a.tel{font-weight:700}
   function apply(t,keepAreas){
     if(t!==undefined) curT=t;
     var shown=0;
-    cards.forEach(function(c){
+    var counts={all:0};
+    document.querySelectorAll('.card').forEach(function(c){ counts.all++; c.getAttribute('data-types').split(' ').forEach(function(x){ if(x) counts[x]=(counts[x]||0)+1; }); });
+    chipsNow().forEach(function(b){ var n=b.querySelector('span'); if(n) n.textContent=counts[b.getAttribute('data-type')]||0; });
+    document.querySelectorAll('.card').forEach(function(c){
       var ok = typeOk(c) && areaOk(c);
       c.hidden=!ok; if(ok) shown++;
     });
-    secs.forEach(function(s){
+    document.querySelectorAll('.sec:not(.agenda)').forEach(function(s){
       var any=s.querySelectorAll('.card:not([hidden])').length>0;
       s.hidden=!any;
     });
@@ -588,7 +711,7 @@ a.tel{font-weight:700}
     });
     var tl=document.getElementById('trylegend'); if(tl) tl.classList.toggle('off',!vis.tryout);
     document.querySelectorAll('.key').forEach(function(p){ p.classList.toggle('off',!p.querySelector('.k:not(.off)')); });
-    chips.forEach(function(b){
+    chipsNow().forEach(function(b){
       var on=b.getAttribute('data-type')===curT; b.classList.toggle('on',on); b.setAttribute('aria-pressed',on?'true':'false');
     });
     abtns.forEach(function(b){
@@ -598,8 +721,9 @@ a.tel{font-weight:700}
     try{ localStorage.setItem('bb-type',curT); localStorage.setItem('bb-areas',Object.keys(areas).join(',')); }catch(e){}
   }
   var flashT;
-  document.querySelectorAll('.hot').forEach(function(a){
-    a.addEventListener('click',function(ev){
+  document.addEventListener('click',function(ev){
+    var a=ev.target.closest&&ev.target.closest('.hot'); if(!a) return;
+    (function(){
       ev.preventDefault();
       var card=document.getElementById('v'+a.getAttribute('data-n'));
       if(!card) return;
@@ -609,15 +733,313 @@ a.tel{font-weight:700}
       document.querySelectorAll('.card.flash').forEach(function(c){c.classList.remove('flash');});
       card.classList.add('flash'); clearTimeout(flashT);
       flashT=setTimeout(function(){card.classList.remove('flash');},2200);
-    });
+    })();
   });
-  chips.forEach(function(b){ b.addEventListener('click',function(){ apply(b.getAttribute('data-type')); }); });
+  document.addEventListener('click',function(ev){ var b=ev.target.closest&&ev.target.closest('.chip'); if(b) apply(b.getAttribute('data-type')); });
+  window.bbApply=function(){ apply(); };
   abtns.forEach(function(b){ b.addEventListener('click',function(){ var k=b.getAttribute('data-area'); if(areas[k]) delete areas[k]; else areas[k]=true; apply(); }); });
   try{ (localStorage.getItem('bb-areas')||'').split(',').forEach(function(k){ if(k==='uptown'||k==='downtown'||k==='tryout') areas[k]=true; }); }catch(e){}
   var saved='all'; try{ saved=localStorage.getItem('bb-type')||'all'; }catch(e){}
   if(!document.querySelector('.chip[data-type="'+saved+'"]')) saved='all';
   apply(saved);
 })();
+</script>
+
+<script type="module">
+/* Restaurant suggestions + admin review (Firebase Firestore/Auth + EmailJS).
+   Fill in CONFIG (see README.md). While it is empty this whole feature stays hidden. */
+const CONFIG = {
+  firebase: { apiKey: '', authDomain: '', projectId: '', appId: '' },
+  adminEmail: '',
+  emailjs: { publicKey: '', serviceId: '', templateAdmin: '', templateDecline: '', templateApproved: '' }
+};
+const FB_VERSION = '10.12.2';
+const BASE = { uptown: 7, downtown: 7, tryout: 5 };          // hand-written cards already on the page
+const BASE_TOTAL = 19;
+const PREFIX = { uptown: 'U', downtown: 'D', tryout: 'T' };
+const PIN_COLOR = { uptown: '#1A73E8', downtown: '#D93025', tryout: '#E37400' };
+const CUISINES = ['Thai', 'Japanese', 'Chinese', 'Vietnamese', 'Latin', 'Mediterranean', 'American'];
+
+if (CONFIG.firebase.apiKey && CONFIG.firebase.projectId && CONFIG.adminEmail) start().catch(function (e) { console.error('Suggestions disabled:', e); });
+
+async function start() {
+  const [app, auth, fs] = await Promise.all([
+    import('https://www.gstatic.com/firebasejs/' + FB_VERSION + '/firebase-app.js'),
+    import('https://www.gstatic.com/firebasejs/' + FB_VERSION + '/firebase-auth.js'),
+    import('https://www.gstatic.com/firebasejs/' + FB_VERSION + '/firebase-firestore.js')
+  ]);
+  const fbApp = app.initializeApp(CONFIG.firebase);
+  const fbAuth = auth.getAuth(fbApp);
+  const db = fs.getFirestore(fbApp);
+  const ADMIN = CONFIG.adminEmail.toLowerCase();
+
+  const $ = function (s, r) { return (r || document).querySelector(s); };
+  function h(tag, props) {
+    const e = document.createElement(tag);
+    for (const k in (props || {})) {
+      const v = props[k];
+      if (k === 'class') e.className = v;
+      else if (k === 'text') e.textContent = v;
+      else if (v != null && v !== false) e.setAttribute(k, v === true ? '' : v);
+    }
+    for (let i = 2; i < arguments.length; i++) if (arguments[i] != null) e.append(arguments[i]);
+    return e;
+  }
+  function svg(tag, attrs, text) {
+    const e = document.createElementNS('http://www.w3.org/2000/svg', tag);
+    for (const k in attrs) e.setAttribute(k, attrs[k]);
+    if (text != null) e.textContent = text;
+    return e;
+  }
+  let toastT;
+  function toast(msg) {
+    const t = $('#bb-toast'); t.textContent = msg; t.hidden = false;
+    clearTimeout(toastT); toastT = setTimeout(function () { t.hidden = true; }, 5000);
+  }
+  function setMsg(form, text, err) { const m = $('.msg', form); m.textContent = text || ''; m.classList.toggle('err', !!err); }
+  function safeUrl(u) {
+    u = (u || '').trim(); if (!u) return '';
+    if (!/^[a-z][a-z0-9+.-]*:/i.test(u)) u = 'https://' + u;
+    try { const x = new URL(u); return (x.protocol === 'https:' || x.protocol === 'http:') && x.hostname.indexOf('.') > 0 ? x.href : ''; } catch (e) { return ''; }
+  }
+  function looksLikeUrl(u) { return !!safeUrl(u) && !/\s/.test(u.trim()); }
+  const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
+
+  async function sendMail(tpl, params) {
+    const c = CONFIG.emailjs;
+    if (!(c.publicKey && c.serviceId && tpl)) return false;
+    try {
+      const r = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ service_id: c.serviceId, template_id: tpl, user_id: c.publicKey, template_params: params })
+      });
+      return r.ok;
+    } catch (e) { return false; }
+  }
+
+  // dialogs
+  document.querySelectorAll('dialog.bbd').forEach(function (d) {
+    d.addEventListener('click', function (ev) { if (ev.target.hasAttribute && ev.target.hasAttribute('data-close')) d.close(); });
+  });
+  $('#sg-bar').hidden = false; $('#sg-foot').hidden = false;
+
+  /* ---------- public: suggest ---------- */
+  const sgDlg = $('#sg-dialog'), sgForm = $('#sg-form');
+  $('#sg-open').addEventListener('click', function () { setMsg(sgForm, ''); sgDlg.showModal(); });
+  sgForm.addEventListener('submit', async function (ev) {
+    ev.preventDefault();
+    const f = new FormData(sgForm), btn = $('button[type=submit]', sgForm);
+    const data = {
+      name: (f.get('name') || '').trim(), website: (f.get('website') || '').trim(),
+      cuisine: (f.get('cuisine') || '').trim(), notes: (f.get('notes') || '').trim(), email: (f.get('email') || '').trim()
+    };
+    if (!data.name) return setMsg(sgForm, 'Please enter the restaurant name.', true);
+    if (!EMAIL_RE.test(data.email) || data.email.length > 254) return setMsg(sgForm, 'Please enter a valid email so we can reply.', true);
+    if (f.get('company')) { sgDlg.close(); sgForm.reset(); return toast('Thanks! Your suggestion was sent.'); }   // honeypot
+    try { if (Date.now() - Number(localStorage.getItem('bb-sg-last') || 0) < 30000) return setMsg(sgForm, 'Please wait a moment before sending another.', true); } catch (e) {}
+    btn.disabled = true; setMsg(sgForm, 'Sending…');
+    try {
+      await fs.addDoc(fs.collection(db, 'suggestions'), Object.assign({ status: 'pending', createdAt: fs.serverTimestamp() }, data));
+      try { localStorage.setItem('bb-sg-last', String(Date.now())); } catch (e) {}
+      sendMail(CONFIG.emailjs.templateAdmin, { to_email: CONFIG.adminEmail, restaurant: data.name, website: data.website, cuisine: data.cuisine, notes: data.notes, from_email: data.email });
+      sgForm.reset(); sgDlg.close(); toast('Thanks! Your suggestion was sent to the admin.');
+    } catch (e) { console.error(e); setMsg(sgForm, 'Could not send. Please try again later.', true); }
+    btn.disabled = false;
+  });
+
+  /* ---------- public: approved restaurants ---------- */
+  let dynCount = 0;
+  function renderRestaurants(list) {
+    document.querySelectorAll('[data-dyn]').forEach(function (n) { n.remove(); });
+    const seq = { uptown: BASE.uptown, downtown: BASE.downtown, tryout: BASE.tryout };
+    const pins = $('svg.pins'), mapimg = $('.mapimg'), chipsBox = $('.chips');
+    let n = BASE_TOTAL;
+    list.forEach(function (r) {
+      if (!PREFIX[r.region] || typeof r.name !== 'string') return;
+      n++; seq[r.region]++;
+      const label = PREFIX[r.region] + seq[r.region];
+      const types = (Array.isArray(r.cuisines) ? r.cuisines : []).map(function (c) { return String(c).replace(/[^A-Za-z]/g, ''); }).filter(Boolean);
+      const typeAttr = types.join(' ');
+      types.forEach(function (t) {
+        if (chipsBox.querySelector('.chip[data-type="' + t + '"]')) return;
+        const b = h('button', { type: 'button', class: 'chip', 'data-type': t, 'aria-pressed': 'false' }, t + ' ', h('span', { text: '0' }));
+        chipsBox.append(b);
+      });
+      // card
+      const url = safeUrl(r.website);
+      const titles = h('div', { class: 'titles' }, h('h3', { text: r.name }));
+      if (url) titles.append(h('a', { class: 'web', href: url, target: '_blank', rel: 'noopener', text: new URL(url).hostname.replace(/^www\./, '') }));
+      const card = h('article', { class: 'card ' + r.region, id: 'v' + n, 'data-types': typeAttr, 'data-dyn': '' },
+        h('header', { class: 'card-h' }, h('span', { class: 'num', text: label }), titles, h('a', { class: 'tomap', href: '#map', text: '↑ Map' })));
+      if (r.food) card.append(h('p', { class: 'food', text: r.food }));
+      if (r.about) card.append(h('p', { class: 'about', text: r.about }));
+      const dl = h('dl');
+      if (r.address) dl.append(h('dt', { text: 'Address' }), h('dd', null, h('a', {
+        href: 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(r.name + ', ' + r.address + ', New York, NY'),
+        target: '_blank', rel: 'noopener', text: r.address })));
+      if (r.phone) {
+        const digits = String(r.phone).replace(/\D/g, '');
+        const tel = digits.length === 10 ? '+1' + digits : digits.length === 11 && digits[0] === '1' ? '+' + digits : '';
+        dl.append(h('dt', { text: 'Phone' }), h('dd', null, tel ? h('a', { class: 'tel', href: 'tel:' + tel, text: r.phone }) : document.createTextNode(r.phone)));
+      }
+      if (r.walk) dl.append(h('dt', { text: 'Walk' }), h('dd', { text: r.walk }));
+      if (r.hours) dl.append(h('dt', { text: 'Hours' }), h('dd', { text: r.hours }));
+      if (dl.children.length) card.append(dl);
+      const grid = $('#' + r.region + ' .grid'); if (grid) grid.append(card);
+      // map pin, hotspot, legend
+      const px = Math.min(100, Math.max(0, Number(r.pinX) || 0)), py = Math.min(100, Math.max(0, Number(r.pinY) || 0));
+      const cx = (px / 100 * 1065).toFixed(1), cy = (py / 100 * 1410).toFixed(1), col = PIN_COLOR[r.region];
+      const g = svg('g', { class: 'pin', 'data-sec': r.region, 'data-types': typeAttr, 'data-dyn': '' });
+      g.append(svg('circle', { cx: cx, cy: cy, r: 26, fill: col, stroke: '#fff', 'stroke-width': 3.5 }),
+        svg('text', { x: cx, y: cy, fill: '#fff', 'font-size': 22, 'font-weight': 700, 'text-anchor': 'middle', 'dominant-baseline': 'central', 'font-family': 'Helvetica,Arial,sans-serif' }, label));
+      pins.append(g);
+      mapimg.append(h('a', { class: 'hot ' + r.region, href: '#v' + n, 'data-n': n, 'data-types': typeAttr, 'data-dyn': '', style: 'left:' + px.toFixed(2) + '%;top:' + py.toFixed(2) + '%', 'aria-label': 'Go to ' + label + ', ' + r.name }, h('span', { text: label })));
+      const key = $('.key.' + r.region);
+      if (key) key.append(document.createTextNode(' '), h('span', { class: 'k', 'data-sec': r.region, 'data-types': typeAttr, 'data-dyn': '', text: label + ' ' + r.name }));
+    });
+    dynCount = list.length;
+    if (window.bbApply) window.bbApply();
+  }
+  fs.onSnapshot(fs.collection(db, 'restaurants'), function (snap) {
+    const list = snap.docs.map(function (d) { return Object.assign({ id: d.id }, d.data({ serverTimestamps: 'estimate' })); });
+    list.sort(function (a, b) {
+      const ta = a.createdAt && a.createdAt.toMillis ? a.createdAt.toMillis() : 0, tb = b.createdAt && b.createdAt.toMillis ? b.createdAt.toMillis() : 0;
+      return ta - tb || (a.id < b.id ? -1 : 1);
+    });
+    renderRestaurants(list);
+  }, function (e) { console.error('Could not load added restaurants', e); });
+
+  /* ---------- admin ---------- */
+  const adDlg = $('#ad-dialog'), dcDlg = $('#dc-dialog'), apDlg = $('#ap-dialog');
+  const dcForm = $('#dc-form'), apForm = $('#ap-form');
+  let isAdmin = false, unsub = null, pending = [], current = null;
+
+  function openAdmin() { adDlg.showModal(); }
+  $('#sg-review').addEventListener('click', openAdmin);
+  $('#ad-link').addEventListener('click', function () {
+    if (isAdmin) return openAdmin();
+    auth.signInWithPopup(fbAuth, new auth.GoogleAuthProvider()).catch(function (e) { if (e && e.code !== 'auth/popup-closed-by-user' && e.code !== 'auth/cancelled-popup-request') toast('Sign-in failed.'); });
+  });
+  $('#ad-out').addEventListener('click', function () { adDlg.close(); auth.signOut(fbAuth); });
+
+  auth.onAuthStateChanged(fbAuth, function (user) {
+    if (unsub) { unsub(); unsub = null; }
+    isAdmin = !!(user && user.email && user.email.toLowerCase() === ADMIN);
+    if (user && !isAdmin) { auth.signOut(fbAuth); toast('That account is not the admin.'); return; }
+    $('#sg-review').hidden = !isAdmin;
+    $('#ad-link').textContent = isAdmin ? 'Admin panel' : 'Admin';
+    $('#ad-who').textContent = isAdmin ? 'Signed in as ' + user.email : '';
+    pending = []; renderPending();
+    if (!isAdmin) return;
+    unsub = fs.onSnapshot(fs.query(fs.collection(db, 'suggestions'), fs.where('status', '==', 'pending')), function (snap) {
+      pending = snap.docs.map(function (d) { return Object.assign({ id: d.id }, d.data({ serverTimestamps: 'estimate' })); });
+      pending.sort(function (a, b) { return (a.createdAt && a.createdAt.toMillis ? a.createdAt.toMillis() : 0) - (b.createdAt && b.createdAt.toMillis ? b.createdAt.toMillis() : 0); });
+      renderPending();
+    }, function (e) { console.error(e); toast('Could not load suggestions.'); });
+  });
+
+  function renderPending() {
+    $('#sg-count').textContent = pending.length ? '(' + pending.length + ')' : '';
+    const box = $('#ad-list'); box.replaceChildren();
+    if (!pending.length) { box.append(h('p', { class: 'sub', text: 'No pending suggestions.' })); return; }
+    pending.forEach(function (s) {
+      const when = s.createdAt && s.createdAt.toDate ? s.createdAt.toDate().toLocaleDateString() : '';
+      const item = h('div', { class: 'sgitem' }, h('h3', { text: s.name }));
+      if (s.website) item.append(h('p', { text: 'Website/address: ' + s.website }));
+      if (s.cuisine) item.append(h('p', { text: 'Cuisine: ' + s.cuisine }));
+      if (s.notes) item.append(h('p', { text: s.notes }));
+      item.append(h('p', { class: 'meta', text: 'From ' + s.email + (when ? ' · ' + when : '') }));
+      const approve = h('button', { type: 'button', class: 'sgbtn', text: 'Approve' });
+      const decline = h('button', { type: 'button', class: 'sgbtn danger', text: 'Decline' });
+      approve.addEventListener('click', function () { openApprove(s); });
+      decline.addEventListener('click', function () { openDecline(s); });
+      item.append(h('div', { class: 'acts' }, decline, approve));
+      box.append(item);
+    });
+  }
+
+  /* decline */
+  function openDecline(s) {
+    current = s; dcForm.reset(); setMsg(dcForm, ''); $('#dc-skip').hidden = true;
+    $('#dc-sub').textContent = s.name + ' · from ' + s.email;
+    adDlg.close(); dcDlg.showModal();
+  }
+  async function finishDecline(reason, sendEmail) {
+    const s = current, btns = dcForm.querySelectorAll('button'); btns.forEach(function (b) { b.disabled = true; });
+    try {
+      if (sendEmail) {
+        const ok = await sendMail(CONFIG.emailjs.templateDecline, { to_email: s.email, restaurant: s.name, reason: reason });
+        if (!ok) { setMsg(dcForm, 'The email could not be sent, so nothing was saved. Try again, or decline without email.', true); $('#dc-skip').hidden = false; return; }
+      }
+      await fs.updateDoc(fs.doc(db, 'suggestions', s.id), { status: 'declined', declineReason: reason, decidedAt: fs.serverTimestamp() });
+      dcDlg.close(); toast(sendEmail ? 'Declined. The reason was emailed.' : 'Declined (no email sent).');
+    } catch (e) { console.error(e); setMsg(dcForm, 'Could not save. Please try again.', true); }
+    finally { btns.forEach(function (b) { b.disabled = false; }); }
+  }
+  dcForm.addEventListener('submit', function (ev) {
+    ev.preventDefault();
+    const reason = new FormData(dcForm).get('reason').trim();
+    if (!reason) return setMsg(dcForm, 'Please write a reason for declining.', true);
+    finishDecline(reason, true);
+  });
+  $('#dc-skip').addEventListener('click', function () {
+    const reason = new FormData(dcForm).get('reason').trim();
+    if (reason) finishDecline(reason, false);
+  });
+
+  /* approve */
+  const cuisBox = $('#ap-cuisines');
+  CUISINES.forEach(function (c) { cuisBox.append(h('label', null, h('input', { type: 'checkbox', name: 'cuisine', value: c }), c)); });
+  const pick = $('#ap-pick'), dot = $('.dot', pick);
+  let pin = null;
+  pick.addEventListener('click', function (ev) {
+    const r = $('img', pick).getBoundingClientRect();
+    pin = { x: Math.min(100, Math.max(0, (ev.clientX - r.left) / r.width * 100)), y: Math.min(100, Math.max(0, (ev.clientY - r.top) / r.height * 100)) };
+    dot.style.left = pin.x + '%'; dot.style.top = pin.y + '%'; dot.hidden = false;
+  });
+  function openApprove(s) {
+    current = s; apForm.reset(); setMsg(apForm, ''); pin = null; dot.hidden = true;
+    $('img', pick).src = $('.mapimg img').src;
+    apForm.elements.name.value = s.name;
+    if (looksLikeUrl(s.website)) apForm.elements.website.value = s.website; else if (s.website) apForm.elements.address.value = s.website;
+    const want = (s.cuisine || '').toLowerCase();
+    cuisBox.querySelectorAll('input').forEach(function (i) { if (want.indexOf(i.value.toLowerCase()) > -1) i.checked = true; });
+    apForm.elements.food.value = (s.cuisine || '').slice(0, 60);
+    apForm.elements.about.value = (s.notes || '').slice(0, 500);
+    const canMail = !!CONFIG.emailjs.templateApproved;
+    $('#ap-mail-l').hidden = !canMail; apForm.elements.notify.checked = canMail;
+    adDlg.close(); apDlg.showModal();
+  }
+  apForm.addEventListener('submit', async function (ev) {
+    ev.preventDefault();
+    const f = apForm.elements, s = current;
+    const cuisines = Array.from(cuisBox.querySelectorAll('input:checked')).map(function (i) { return i.value; });
+    const other = f.otherCuisine.value.replace(/[^A-Za-z]/g, ''); if (other && cuisines.indexOf(other) < 0) cuisines.push(other);
+    const name = f.name.value.trim();
+    if (!f.region.value) return setMsg(apForm, 'Please choose a region.', true);
+    if (!name) return setMsg(apForm, 'Please enter the name.', true);
+    if (!cuisines.length) return setMsg(apForm, 'Pick at least one cuisine.', true);
+    if (f.website.value.trim() && !safeUrl(f.website.value)) return setMsg(apForm, 'That website does not look valid.', true);
+    if (!pin) return setMsg(apForm, 'Click the map to place the pin.', true);
+    const btn = $('button[type=submit]', apForm); btn.disabled = true; setMsg(apForm, 'Saving…');
+    try {
+      const ref = await fs.addDoc(fs.collection(db, 'restaurants'), {
+        region: f.region.value, name: name, cuisines: cuisines, food: f.food.value.trim(), about: f.about.value.trim(),
+        website: safeUrl(f.website.value), address: f.address.value.trim(), phone: f.phone.value.trim(),
+        walk: f.walk.value.trim(), hours: f.hours.value.trim(),
+        pinX: Math.round(pin.x * 100) / 100, pinY: Math.round(pin.y * 100) / 100, createdAt: fs.serverTimestamp()
+      });
+      await fs.updateDoc(fs.doc(db, 'suggestions', s.id), { status: 'approved', restaurantId: ref.id, decidedAt: fs.serverTimestamp() });
+      let note = '';
+      if (f.notify.checked && !f.notify.closest('label').hidden) {
+        const ok = await sendMail(CONFIG.emailjs.templateApproved, { to_email: s.email, restaurant: name });
+        if (!ok) note = ' (the approval email could not be sent)';
+      }
+      apDlg.close(); toast('Added to the list.' + note);
+    } catch (e) { console.error(e); setMsg(apForm, 'Could not save. Please try again.', true); }
+    btn.disabled = false;
+  });
+}
 </script>
 
 </body></html>

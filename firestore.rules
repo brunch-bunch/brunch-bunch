@@ -1,0 +1,46 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Replace with the admin's Google account email (lowercase).
+    function isAdmin() {
+      return request.auth != null
+        && request.auth.token.email_verified == true
+        && request.auth.token.email.lower() == 'ADMIN_EMAIL_HERE';
+    }
+
+    function validSuggestion(d) {
+      return d.keys().hasOnly(['name', 'website', 'cuisine', 'notes', 'email', 'status', 'createdAt'])
+        && d.keys().hasAll(['name', 'website', 'cuisine', 'notes', 'email', 'status', 'createdAt'])
+        && d.name is string && d.name.size() > 0 && d.name.size() <= 100
+        && d.website is string && d.website.size() <= 200
+        && d.cuisine is string && d.cuisine.size() <= 60
+        && d.notes is string && d.notes.size() <= 500
+        && d.email is string && d.email.size() <= 254 && d.email.matches('[^@ ]+@[^@ ]+[.][^@ ]+')
+        && d.status == 'pending'
+        && d.createdAt == request.time;
+    }
+
+    function validRestaurant(d) {
+      return d.region in ['uptown', 'downtown', 'tryout']
+        && d.name is string && d.name.size() > 0 && d.name.size() <= 100
+        && d.cuisines is list && d.cuisines.size() > 0 && d.cuisines.size() <= 8
+        && d.pinX is number && d.pinX >= 0 && d.pinX <= 100
+        && d.pinY is number && d.pinY >= 0 && d.pinY <= 100;
+    }
+
+    // Anyone can submit a suggestion. Only the admin can read or change them,
+    // so suggestors' email addresses are never public.
+    match /suggestions/{id} {
+      allow create: if validSuggestion(request.resource.data);
+      allow read, update, delete: if isAdmin();
+    }
+
+    // Approved restaurants are public to read. Only the admin can write.
+    match /restaurants/{id} {
+      allow read: if true;
+      allow create, update: if isAdmin() && validRestaurant(request.resource.data);
+      allow delete: if isAdmin();
+    }
+  }
+}
