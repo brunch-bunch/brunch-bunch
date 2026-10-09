@@ -16,16 +16,15 @@ A single static page (`index.html`). The "Suggest a place" feature is optional a
 2. **Build > Firestore Database > Create database** (production mode).
 3. **Build > Authentication > Get started > Google** (enable it).
 4. **Authentication > Settings > Authorized domains**: add the domain the site is served from (for example `brunch-bunch.github.io`).
-5. **Firestore > Rules**: paste `firestore.rules` from this repo, replace `ADMIN_EMAIL_HERE` with the admin's Google email (lowercase), and publish.
+5. **Firestore > Rules**: paste `firestore.rules` from this repo (it already contains the admin email, so change it there if the admin changes) and publish.
 6. **Project settings > Your apps > Web app**: copy `apiKey`, `authDomain`, `projectId`, `appId` into `CONFIG.firebase`. Set `CONFIG.adminEmail` to the same admin email. (These values are public by design; the rules protect the data.)
 
 ### EmailJS (free plan)
 1. Create an account at <https://www.emailjs.com> and add an email service (for example Gmail).
-2. Create three templates. In each, set **To email** to `{{to_email}}`:
-   - **Admin notice** (`templateAdmin`): uses `{{restaurant}}`, `{{website}}`, `{{cuisine}}`, `{{notes}}`, `{{from_email}}`.
-   - **Decline** (`templateDecline`): uses `{{restaurant}}` and `{{reason}}`.
-   - **Approved** (`templateApproved`, optional): uses `{{restaurant}}`.
-3. Copy the public key, service id and template ids into `CONFIG.emailjs`.
+2. Create two templates (the free plan allows two):
+   - **Template A, admin notice** (`templateAdmin`): To Email `{{to_email}}`. Uses `{{restaurant}}`, `{{website}}`, `{{cuisine}}`, `{{notes}}`, `{{from_email}}`.
+   - **Template B, reply to suggester** (`templateReply`, used for both decline and approved): To Email `{{to_email}}`, Subject `{{subject}}`, Content `{{message}}` only, From Name "Brunch Bunch", Reply To set to the admin's own address (typed directly, no curly braces). The site fills in the subject and message for each case.
+3. Copy the public key, service id and the two template ids into `CONFIG.emailjs` (`templateAdmin`, `templateReply`).
 4. In EmailJS **Account > Security**, restrict the public key to your site's domain.
 
 ## Security notes
