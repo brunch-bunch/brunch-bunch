@@ -191,6 +191,7 @@ dialog.bbd::backdrop{background:rgba(10,14,22,.6)}
 .sgitem p{font-size:.92rem;overflow-wrap:anywhere}
 .sgitem .meta{color:var(--muted);font-size:.82rem}
 .sgitem .acts{margin-top:4px}
+.card .rm{align-self:flex-start;font-size:.8rem;min-height:36px;padding:4px 14px}
 #bb-toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);max-width:min(480px,calc(100vw - 32px));background:var(--ink);color:var(--bg);padding:12px 18px;border-radius:12px;font-weight:600;font-size:.95rem;z-index:50;box-shadow:var(--shadow-up)}
 </style>
 
@@ -850,9 +851,12 @@ async function start() {
     btn.disabled = false;
   });
 
+  let isAdmin = false;
+
   /* ---------- public: approved restaurants ---------- */
-  let dynCount = 0;
+  let lastList = [];
   function renderRestaurants(list) {
+    lastList = list;
     document.querySelectorAll('[data-dyn]').forEach(function (n) { n.remove(); });
     const seq = { uptown: BASE.uptown, downtown: BASE.downtown, tryout: BASE.tryout };
     const pins = $('svg.pins'), mapimg = $('.mapimg'), chipsBox = $('.chips');
@@ -888,6 +892,16 @@ async function start() {
       if (r.walk) dl.append(h('dt', { text: 'Walk' }), h('dd', { text: r.walk }));
       if (r.hours) dl.append(h('dt', { text: 'Hours' }), h('dd', { text: r.hours }));
       if (dl.children.length) card.append(dl);
+      if (isAdmin) {
+        const rm = h('button', { type: 'button', class: 'sgbtn danger rm', text: 'Remove from site' });
+        rm.addEventListener('click', async function () {
+          if (!confirm('Remove ' + r.name + ' from the site? Later places in this section will be renumbered.')) return;
+          rm.disabled = true;
+          try { await fs.deleteDoc(fs.doc(db, 'restaurants', r.id)); toast('Removed ' + r.name + '.'); }
+          catch (e) { console.error(e); rm.disabled = false; toast('Could not remove it. Please try again.'); }
+        });
+        card.append(rm);
+      }
       const grid = $('#' + r.region + ' .grid'); if (grid) grid.append(card);
       // map pin, hotspot, legend
       const px = Math.min(100, Math.max(0, Number(r.pinX) || 0)), py = Math.min(100, Math.max(0, Number(r.pinY) || 0));
@@ -900,7 +914,6 @@ async function start() {
       const key = $('.key.' + r.region);
       if (key) key.append(document.createTextNode(' '), h('span', { class: 'k', 'data-sec': r.region, 'data-types': typeAttr, 'data-dyn': '', text: label + ' ' + r.name }));
     });
-    dynCount = list.length;
     if (window.bbApply) window.bbApply();
   }
   fs.onSnapshot(fs.collection(db, 'restaurants'), function (snap) {
@@ -915,7 +928,7 @@ async function start() {
   /* ---------- admin ---------- */
   const adDlg = $('#ad-dialog'), dcDlg = $('#dc-dialog'), apDlg = $('#ap-dialog');
   const dcForm = $('#dc-form'), apForm = $('#ap-form');
-  let isAdmin = false, unsub = null, pending = [], current = null;
+  let unsub = null, pending = [], current = null;
 
   function openAdmin() { adDlg.showModal(); }
   $('#sg-review').addEventListener('click', openAdmin);
@@ -932,7 +945,7 @@ async function start() {
     $('#sg-review').hidden = !isAdmin;
     $('#ad-link').textContent = isAdmin ? 'Admin panel' : 'Admin';
     $('#ad-who').textContent = isAdmin ? 'Signed in as ' + user.email : '';
-    pending = []; renderPending();
+    pending = []; renderPending(); renderRestaurants(lastList);
     if (!isAdmin) return;
     unsub = fs.onSnapshot(fs.query(fs.collection(db, 'suggestions'), fs.where('status', '==', 'pending')), function (snap) {
       pending = snap.docs.map(function (d) { return Object.assign({ id: d.id }, d.data({ serverTimestamps: 'estimate' })); });
