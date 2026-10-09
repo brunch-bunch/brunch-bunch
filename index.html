@@ -746,12 +746,12 @@ dialog.bbd::backdrop{background:rgba(10,14,22,.6)}
 </script>
 
 <script type="module">
-/* Restaurant suggestions + admin review (Firebase Firestore/Auth + EmailJS).
+/* Restaurant suggestions + admin review (Firebase Firestore/Auth + an Apps Script mail server).
    Fill in CONFIG (see README.md). While it is empty this whole feature stays hidden. */
 const CONFIG = {
   firebase: { apiKey: 'AIzaSyBk-fzWz0OTSCneIXompNReNWH46AGEblM', authDomain: 'brunch-bunch-9b1af.firebaseapp.com', projectId: 'brunch-bunch-9b1af', appId: '1:611750400174:web:d6dc1caf09c4fbc8435d3f' },
   adminEmail: 'jasonjinoh@gmail.com',
-  emailjs: { publicKey: 'IZWwANEtF5MSNWiSS', serviceId: 'service_j0d03j5', templateAdmin: 'template_khrxgaj', templateReply: 'template_rlgbu97' }
+  mailerUrl: ''   // Apps Script web app URL that sends the emails (see README.md and server/mailer.gs)
 };
 const FB_VERSION = '10.12.2';
 const BASE = { uptown: 7, downtown: 7, tryout: 5 };          // hand-written cards already on the page
@@ -805,20 +805,20 @@ async function start() {
   function looksLikeUrl(u) { return !!safeUrl(u) && !/\s/.test(u.trim()); }
   const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
 
-  async function sendMail(tpl, params) {
-    const c = CONFIG.emailjs;
-    if (!(c.publicKey && c.serviceId && tpl)) return false;
+  // Emails are sent by the Apps Script server (server/mailer.gs), which verifies the admin's
+  // sign-in token and takes the recipient from the stored suggestion. No mail credentials live here.
+  async function callMailer(payload) {
+    if (!CONFIG.mailerUrl) return false;
     try {
-      const r = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ service_id: c.serviceId, template_id: tpl, user_id: c.publicKey, template_params: params })
-      });
-      return r.ok;
+      const r = await fetch(CONFIG.mailerUrl, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(payload) });
+      const j = await r.json();
+      return !!(j && j.ok);
     } catch (e) { return false; }
   }
-
-  // One generic template (subject + message) serves both decline and approved emails.
-  function sendReply(to, subject, message) { return sendMail(CONFIG.emailjs.templateReply, { to_email: to, subject: subject, message: message }); }
+  async function adminMail(action, suggestionId, extra) {
+    const user = fbAuth.currentUser; if (!user) return false;
+    return callMailer(Object.assign({ action: action, suggestionId: suggestionId, idToken: await user.getIdToken() }, extra || {}));
+  }
 
   // dialogs
   document.querySelectorAll('dialog.bbd').forEach(function (d) {
@@ -844,7 +844,7 @@ async function start() {
     try {
       await fs.addDoc(fs.collection(db, 'suggestions'), Object.assign({ status: 'pending', createdAt: fs.serverTimestamp() }, data));
       try { localStorage.setItem('bb-sg-last', String(Date.now())); } catch (e) {}
-      sendMail(CONFIG.emailjs.templateAdmin, { to_email: CONFIG.adminEmail, restaurant: data.name, website: data.website, cuisine: data.cuisine, notes: data.notes, from_email: data.email });
+      callMailer({ action: 'notify' });
       sgForm.reset(); sgDlg.close(); toast('Thanks! Your suggestion was sent to the admin.');
     } catch (e) { console.error(e); setMsg(sgForm, 'Could not send. Please try again later.', true); }
     btn.disabled = false;
@@ -971,7 +971,7 @@ async function start() {
     const s = current, btns = dcForm.querySelectorAll('button'); btns.forEach(function (b) { b.disabled = true; });
     try {
       if (sendEmail) {
-        const ok = await sendReply(s.email, 'About your suggestion: ' + s.name, 'Thanks for suggesting ' + s.name + '. We couldn\'t add it: ' + reason);
+        const ok = await adminMail('decline', s.id, { reason: reason });
         if (!ok) { setMsg(dcForm, 'The email could not be sent, so nothing was saved. Try again, or decline without email.', true); $('#dc-skip').hidden = false; return; }
       }
       await fs.updateDoc(fs.doc(db, 'suggestions', s.id), { status: 'declined', declineReason: reason, decidedAt: fs.serverTimestamp() });
@@ -1009,7 +1009,7 @@ async function start() {
     cuisBox.querySelectorAll('input').forEach(function (i) { if (want.indexOf(i.value.toLowerCase()) > -1) i.checked = true; });
     apForm.elements.food.value = (s.cuisine || '').slice(0, 60);
     apForm.elements.about.value = (s.notes || '').slice(0, 500);
-    const canMail = !!CONFIG.emailjs.templateReply;
+    const canMail = !!CONFIG.mailerUrl;
     $('#ap-mail-l').hidden = !canMail; apForm.elements.notify.checked = canMail;
     adDlg.close(); apDlg.showModal();
   }
@@ -1032,12 +1032,12 @@ async function start() {
         walk: f.walk.value.trim(), hours: f.hours.value.trim(),
         pinX: Math.round(pin.x * 100) / 100, pinY: Math.round(pin.y * 100) / 100, createdAt: fs.serverTimestamp()
       });
-      await fs.updateDoc(fs.doc(db, 'suggestions', s.id), { status: 'approved', restaurantId: ref.id, decidedAt: fs.serverTimestamp() });
       let note = '';
-      if (f.notify.checked && !f.notify.closest('label').hidden) {
-        const ok = await sendReply(s.email, name + ' was added!', 'Good news! ' + name + ' has been added to the site. Thanks for the suggestion!');
+      if (f.notify.checked && !f.notify.closest('label').hidden) {   // the server needs the suggestion to still be pending
+        const ok = await adminMail('approved', s.id);
         if (!ok) note = ' (the approval email could not be sent)';
       }
+      await fs.updateDoc(fs.doc(db, 'suggestions', s.id), { status: 'approved', restaurantId: ref.id, decidedAt: fs.serverTimestamp() });
       apDlg.close(); toast('Added to the list.' + note);
     } catch (e) { console.error(e); setMsg(apForm, 'Could not save. Please try again.', true); }
     btn.disabled = false;
