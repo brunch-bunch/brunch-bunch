@@ -16,12 +16,12 @@ A single static page (`index.html`). The "Suggest a place" feature is optional a
 2. **Build > Firestore Database > Create database** (production mode).
 3. **Build > Authentication > Get started > Google** (enable it).
 4. **Authentication > Settings > Authorized domains**: add the domain the site is served from (for example `brunch-bunch.github.io`).
-5. **Firestore > Rules**: paste `firestore.rules` from this repo (it already contains the admin email, so change it there if the admin changes) and publish.
-6. **Project settings > Your apps > Web app**: copy `apiKey`, `authDomain`, `projectId`, `appId` into `CONFIG.firebase`. Set `CONFIG.adminEmail` to the same admin email. (These values are public by design; the rules protect the data.)
+5. **Firestore > Rules**: paste `firestore.rules` from this repo (it already contains the admin emails; to add or remove an admin, change the list there, in `CONFIG.adminEmails`, and in `ADMIN_EMAILS` in `server/mailer.gs`, then republish the rules and redeploy the script) and publish.
+6. **Project settings > Your apps > Web app**: copy `apiKey`, `authDomain`, `projectId`, `appId` into `CONFIG.firebase`. Set `CONFIG.adminEmails` to the admin email(s). (These values are public by design; the rules protect the data.)
 
 ### Mail server (Google Apps Script, free)
 Emails go out through a small Apps Script web app, so no mail key is ever in the page. It verifies that the request comes from the signed-in admin, and the recipient is read from the stored suggestion, never from the request.
-1. Go to <https://script.google.com> (signed in as the admin Google account), create a new project, and paste in `server/mailer.gs`. Check `PROJECT_ID`, `WEB_API_KEY` and `ADMIN_EMAIL` at the top.
+1. Go to <https://script.google.com> (signed in as the admin Google account), create a new project, and paste in `server/mailer.gs`. Check `PROJECT_ID`, `WEB_API_KEY` and `ADMIN_EMAILS` at the top.
 2. **Deploy > New deployment > Web app**. Set **Execute as: Me** and **Who has access: Anyone**. Authorize when asked (it needs Gmail send and external requests).
 3. Copy the web app URL (ends in `/exec`) into `CONFIG.mailerUrl` in `index.html`.
 4. After you change `mailer.gs`, use **Deploy > Manage deployments > Edit > New version** so the change goes live.

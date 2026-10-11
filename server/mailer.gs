@@ -10,7 +10,7 @@
 
 var PROJECT_ID = 'brunch-bunch-9b1af';
 var WEB_API_KEY = 'AIzaSyBk-fzWz0OTSCneIXompNReNWH46AGEblM';   // Firebase web API key (public)
-var ADMIN_EMAIL = 'jasonjinoh@gmail.com';
+var ADMIN_EMAILS = ['jasonjinoh@gmail.com', 'tsui.derek@gmail.com'];   // keep in sync with firestore.rules and index.html
 var SITE_NAME = 'Brunch Bunch';
 var MAX_REASON = 1000;
 var NOTIFY_COOLDOWN_SECONDS = 600;
@@ -37,7 +37,7 @@ function notifyAdmin_() {
   var cache = CacheService.getScriptCache();
   if (cache.get('notify')) return { ok: true, throttled: true };
   cache.put('notify', '1', NOTIFY_COOLDOWN_SECONDS);
-  GmailApp.sendEmail(ADMIN_EMAIL, SITE_NAME + ': new restaurant suggestion',
+  GmailApp.sendEmail(ADMIN_EMAILS.join(','), SITE_NAME + ': new restaurant suggestion',
     'Someone suggested a restaurant. Open the site, click Admin, and sign in to review it.', { name: SITE_NAME });
   return { ok: true };
 }
@@ -61,7 +61,7 @@ function replyToSuggestor_(req) {
     subject = s.name + ' was added!';
     message = 'Good news! ' + s.name + ' has been added to the site. Thanks for the suggestion!';
   }
-  GmailApp.sendEmail(s.email, subject.replace(/[\r\n]+/g, ' '), message, { name: SITE_NAME, replyTo: ADMIN_EMAIL });
+  GmailApp.sendEmail(s.email, subject.replace(/[\r\n]+/g, ' '), message, { name: SITE_NAME, replyTo: ADMIN_EMAILS.join(',') });
   return { ok: true };
 }
 
@@ -73,7 +73,7 @@ function requireAdmin_(idToken) {
   if (res.getResponseCode() !== 200) throw new Error('Sign-in could not be verified');
   var users = JSON.parse(res.getContentText()).users || [];
   var u = users[0];
-  if (!u || u.emailVerified !== true || String(u.email || '').toLowerCase() !== ADMIN_EMAIL.toLowerCase()) throw new Error('Not the admin');
+  if (!u || u.emailVerified !== true || ADMIN_EMAILS.map(function (a) { return a.toLowerCase(); }).indexOf(String(u.email || '').toLowerCase()) < 0) throw new Error('Not the admin');
 }
 
 // Reads the pending suggestion with the admin's own token (Firestore rules allow only the admin).

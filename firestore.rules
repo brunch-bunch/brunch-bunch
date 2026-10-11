@@ -2,11 +2,11 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Replace with the admin's Google account email (lowercase).
+    // Google accounts allowed to review suggestions (lowercase). Keep in sync with index.html and server/mailer.gs.
     function isAdmin() {
       return request.auth != null
         && request.auth.token.email_verified == true
-        && request.auth.token.email.lower() == 'jasonjinoh@gmail.com';
+        && request.auth.token.email.lower() in ['jasonjinoh@gmail.com', 'tsui.derek@gmail.com'];
     }
 
     function validSuggestion(d) {
