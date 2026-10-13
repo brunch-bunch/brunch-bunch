@@ -1,14 +1,12 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-
-    // Replace with the admin's Google account email (lowercase).
+    // Google accounts allowed to review suggestions (lowercase). Keep in sync with index.html and server/mailer.gs.
     function isAdmin() {
       return request.auth != null
         && request.auth.token.email_verified == true
-        && request.auth.token.email.lower() == 'jasonjinoh@gmail.com';
+        && request.auth.token.email.lower() in ['jasonjinoh@gmail.com', 'tsui.derek@gmail.com'];
     }
-
     function validSuggestion(d) {
       return d.keys().hasOnly(['name', 'website', 'cuisine', 'notes', 'email', 'status', 'createdAt'])
         && d.keys().hasAll(['name', 'website', 'cuisine', 'notes', 'email', 'status', 'createdAt'])
@@ -20,7 +18,6 @@ service cloud.firestore {
         && d.status == 'pending'
         && d.createdAt == request.time;
     }
-
     function validRestaurant(d) {
       return d.region in ['uptown', 'downtown', 'tryout']
         && d.name is string && d.name.size() > 0 && d.name.size() <= 100
@@ -28,14 +25,12 @@ service cloud.firestore {
         && d.pinX is number && d.pinX >= 0 && d.pinX <= 100
         && d.pinY is number && d.pinY >= 0 && d.pinY <= 100;
     }
-
     // Anyone can submit a suggestion. Only the admin can read or change them,
     // so suggestors' email addresses are never public.
     match /suggestions/{id} {
       allow create: if validSuggestion(request.resource.data);
       allow read, update, delete: if isAdmin();
     }
-
     // Approved restaurants are public to read. Only the admin can write.
     match /restaurants/{id} {
       allow read: if true;
