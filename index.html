@@ -751,7 +751,7 @@ dialog.bbd::backdrop{background:rgba(10,14,22,.6)}
    Fill in CONFIG (see README.md). While it is empty this whole feature stays hidden. */
 const CONFIG = {
   firebase: { apiKey: 'AIzaSyBk-fzWz0OTSCneIXompNReNWH46AGEblM', authDomain: 'brunch-bunch-9b1af.firebaseapp.com', projectId: 'brunch-bunch-9b1af', appId: '1:611750400174:web:d6dc1caf09c4fbc8435d3f' },
-  adminEmail: 'jasonjinoh@gmail.com',
+  adminEmails: ['jasonjinoh@gmail.com', 'tsui.derek@gmail.com'],
   mailerUrl: 'https://script.google.com/macros/s/AKfycbwIlEu0q6Ziy_iRv_3VIbpafkvijToDh-OrUoOeCUDjS2oOfbeGMnF_wHB29UUknpKw/exec'   // Apps Script web app URL that sends the emails (see README.md and server/mailer.gs)
 };
 const FB_VERSION = '10.12.2';
@@ -761,7 +761,7 @@ const PREFIX = { uptown: 'U', downtown: 'D', tryout: 'T' };
 const PIN_COLOR = { uptown: '#1A73E8', downtown: '#D93025', tryout: '#E37400' };
 const CUISINES = ['Thai', 'Japanese', 'Chinese', 'Vietnamese', 'Latin', 'Mediterranean', 'American'];
 
-if (CONFIG.firebase.apiKey && CONFIG.firebase.projectId && CONFIG.adminEmail) start().catch(function (e) { console.error('Suggestions disabled:', e); });
+if (CONFIG.firebase.apiKey && CONFIG.firebase.projectId && CONFIG.adminEmails.length) start().catch(function (e) { console.error('Suggestions disabled:', e); });
 
 async function start() {
   const [app, auth, fs] = await Promise.all([
@@ -772,7 +772,7 @@ async function start() {
   const fbApp = app.initializeApp(CONFIG.firebase);
   const fbAuth = auth.getAuth(fbApp);
   const db = fs.getFirestore(fbApp);
-  const ADMIN = CONFIG.adminEmail.toLowerCase();
+  const ADMINS = CONFIG.adminEmails.map(function (e) { return e.toLowerCase(); });
 
   const $ = function (s, r) { return (r || document).querySelector(s); };
   function h(tag, props) {
@@ -940,7 +940,7 @@ async function start() {
 
   auth.onAuthStateChanged(fbAuth, function (user) {
     if (unsub) { unsub(); unsub = null; }
-    isAdmin = !!(user && user.email && user.email.toLowerCase() === ADMIN);
+    isAdmin = !!(user && user.email &&ADMINS.indexOf(user.email.toLowerCase()) > -1);
     if (user && !isAdmin) { auth.signOut(fbAuth); toast('That account is not the admin.'); return; }
     $('#sg-review').hidden = !isAdmin;
     $('#ad-link').textContent = isAdmin ? 'Admin panel' : 'Admin';
